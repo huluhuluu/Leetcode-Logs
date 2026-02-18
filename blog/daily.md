@@ -169,7 +169,75 @@ class Solution:
 ### 4. 学习
 cpp中`popcount(x) `获得x的二进制表示中1的个数，python中`bin(x).count("1")`获得x的二进制表示中1的个数.
 
-## (02.18) 
+## (02.18) 交替位二进制数
+### 1. 题目
+[交替位二进制数](https://leetcode.cn/problems/binary-number-with-alternating-bits/description/?envType=daily-question&envId=2026-02-18)：给定一个正整数，检查它的二进制表示是否总是 0、1 交替出现：换句话说，就是二进制表示中相邻两位的数字永不相同。
+### 2. 思路
+#### 2.1 思路1
+直接模拟，逐位检查相邻两位是否相同。
+### 3. 代码
+```cpp
+class Solution {
+public:
+    bool hasAlternatingBits(int n) {
+        bool flag = n&1;
+        while(n>0){
+            if(flag == (bool)(n&1)) n = n>>1, flag = !flag;
+            else return false;
+        }
+        return true;
+    }
+};
+```
+```python
+class Solution:
+    def hasAlternatingBits(self, n: int) -> bool:
+        flag = n&1
+        while n:
+            if n&1 == flag:
+                n, flag = n>>1, not flag
+            else:
+                return False
+        return True
+```
+### 4. 学习
+这里cpp的比较要注意类型转换，不会自动转换为bool类型，python的比较会自动转换为bool类型。
+可以直接位运算。
+
+## (02.19) 计数二进制子串
+### 1. 题目
+[计数二进制子串](https://leetcode.cn/problems/count-binary-substrings/description/?envType=daily-question&envId=2026-02-19)：给定一个字符串 s，统计并返回具有相同数量 0 和 1 的非空（连续）子字符串的数量，并且这些子字符串中的所有 0 和所有 1 都是成组连续的。
+
+重复出现（不同位置）的子串也要统计它们出现的次数。
+### 2. 思路
+单次扫描，统计连续0和连续1的数量，结果就是相邻两组0和1的数量较小值之和。
+### 3. 代码
+```cpp
+class Solution {
+public:
+    int countBinarySubstrings(string s) {
+        int flag = s[0] - '0', res = 0, cnt = 0, last_cnt = 0, idx = 0, l = s.length();
+        while(idx<l){
+            while(idx<l && s[idx] - '0'==flag) cnt++, idx++;
+            res = res + min(cnt, last_cnt), last_cnt=cnt, cnt = 0, flag = 1-flag;
+        }
+        return res;
+
+    }
+};
+```
+```python
+class Solution:
+    def countBinarySubstrings(self, s: str) -> int:
+        cnt, last_cnt, flag, res, n, idx = 0, 0, int(s[0]), 0, len(s), 0
+        while idx < n:
+            while idx < n and int(s[idx])==flag:
+                idx, cnt = idx + 1, cnt + 1
+            res, last_cnt, cnt, flag = res + min(cnt, last_cnt), cnt, 0, 1 - flag
+        return res
+```
+
+## (02.20) 
 ### 1. 题目
 []()：
 ### 2. 思路
