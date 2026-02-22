@@ -237,7 +237,197 @@ class Solution:
         return res
 ```
 
-## (02.20) 
+## (02.20) 特殊的二进制字符串
+### 1. 题目
+[特殊的二进制字符串](https://leetcode.cn/problems/special-binary-string/description/?envType=daily-question&envId=2026-02-20)：特殊的二进制字符串 是具有以下两个性质的二进制序列：
+
+0 的数量与 1 的数量相等。
+二进制序列的每一个前缀码中 1 的数量要大于等于 0 的数量。
+给定一个特殊的二进制字符串 s。
+
+一次移动操作包括选择字符串 s 中的两个连续的、非空的、特殊子串，并交换它们。两个字符串是连续的，如果第一个字符串的最后一个字符与第二个字符串的第一个字符的索引相差正好为 1。
+
+返回在字符串上应用任意次操作后可能得到的字典序最大的字符串。
+### 2. 思路
+模拟，先找出所有特殊子串，然后两两比较，如果前一个子串字典序小于后一个子串字典序，并且前一个子串不是后一个子串的前缀，则交换两个子串。重复这个过程直到没有可以交换的子串为止。
+
+会不会出现交换后的子串不是特殊子串的情况？不会，因为交换的两个子串都是特殊子串，交换后仍然是特殊子串，可以继续交换。
+### 3. 代码
+```cpp
+class Solution {
+public:
+    string makeLargestSpecial(string s) {
+        int n = s.length();
+        auto check = [&n, &s](){
+            vector<pair<int, int> > pos;
+            for(int i=0;i<n;i++){
+                for(int l=2;l+i<=n;l++){
+                    int cnt0=0, cnt1=0, idx = 0, flag = true;
+                    while(idx<l){
+                        cnt0 += s[i+idx]=='0', cnt1 += s[i+idx]=='1', idx++;
+                        if(cnt0>cnt1){flag=false; break;}
+                    }
+                    if(flag && cnt0 == cnt1) pos.push_back(std::make_pair(i,l));
+                }
+            }
+            return pos;
+        };
+        auto getStr = [](string& s, int p, int l){
+            return s.substr(p, l);
+        };
+        while(1){
+            bool flag = true;
+            auto l = check();
+        
+            bool jumpflag = false;
+            for(int i=0;i<l.size();i++){
+                for(int j=i+1;j<l.size();j++){
+                    int b1 = l[i].first, l1 = l[i].second;
+                    int b2 = l[j].first, l2 = l[j].second;
+                    if(b1 + l1 != b2) continue;
+                    string tmp_s1 = getStr(s, b1, l1);
+                    string tmp_s2 = getStr(s, b2, l2);
+                    if(tmp_s1 < tmp_s2 && tmp_s1 != getStr(tmp_s2, 0, l1)){
+                        tmp_s1 = tmp_s2 + tmp_s1;
+                        for(int j=0;j<tmp_s1.length();j++){
+                            s[b1+j] = tmp_s1[j]; 
+                        }
+                        flag = false;
+                        jumpflag = true;
+                        break;
+                    }
+                }
+                if(jumpflag) break;
+                
+            }
+            if(flag) break;
+        }
+        return s;
+    }
+};
+```
+```python
+class Solution:
+    def makeLargestSpecial(self, s: str) -> str:
+        n = len(s)
+        def checkSub(s, b, l):
+            cnt0, cnt1, flag = 0, 0, True
+            for i in range(l):
+                cnt0, cnt1 = cnt0 + (s[b+i]=='0'), cnt1 + (s[b+i]=='1')
+                if cnt0 > cnt1:
+                    flag = False
+                    break
+            return flag and (cnt0 == cnt1)
+
+        def findSub(s):
+            pos, n = [[] for c in s], len(s)
+            for i in range(n):
+                for l in range(2, n+1):
+                    if i+l > n:
+                        break
+                    if checkSub(s, i, l):
+                        pos[i].append(l)
+            return pos
+        while 1:
+            bflag, jumpflag, pos = True, False, findSub(s)
+            for i in range(n):
+                if len(pos[i]) == 0:
+                    continue
+                for il in pos[i]:
+                    if i + il >= n or len(pos[i + il]) == 0:
+                        continue
+                    j = i + il
+                    for jl in pos[i + il]:
+                        if s[i:i+il] < s[j:j+jl] and s[j:j+jl][:il] != s[i:i+il]:
+                            # swap
+                            # s[i:i+il+jl] = s[j:jl] + s[i:i+il]
+                            s = s[:i] + s[j:j+jl] + s[i:i+il] + s[j+jl:]
+                            jumpflag, bflag = True, False
+                            break
+                    if jumpflag:
+                        break
+                if jumpflag:
+                    break
+
+            if bflag:
+                break
+        return s
+```
+### 4. 学习
+python切片 如果是不可变对象如字符串，切片会返回一个新的对象；如果是可变对象如列表，切片会返回一个新的对象，但其中的元素仍然是原来对象中的元素的引用。
+
+题解大概是分成大的子串，子串内部进行排序，最后把子串进行排序。
+
+## (02.21) 二进制表示中质数个计算置位
+### 1. 题目
+[二进制表示中质数个计算置位](https://leetcode.cn/problems/prime-number-of-set-bits-in-binary-representation/description/?envType=daily-question&envId=2026-02-21)：给你两个整数 left 和 right ，在闭区间 [left, right] 范围内，统计并返回 计算置位位数为质数 的整数个数。
+
+计算置位位数 就是二进制表示中 1 的个数。
+
+例如， 21 的二进制表示 10101 有 3 个计算置位。
+### 2. 思路
+打表质数(这里位数最多32位)，然后遍历区间统计，用位运算只数1的个数。
+### 3. 代码
+```cpp
+class Solution {
+public:
+    int countPrimeSetBits(int left, int right) {
+        vector<int> prime(33, 0);
+        prime[2] = prime[3] = prime[5] = prime[7] = prime[11] = prime[13] = prime[17] = prime[19] = prime[23] = prime[29] = prime[32] = 1;
+        auto cntOne = [](int num){
+            int res = 0;
+            while(num){
+                res += 1, num = num & (num - 1);
+            }
+            return res;
+        };
+        int res = 0;
+        while(left<=right){
+            res += prime[cntOne(left++)];
+        }
+        return res;
+    }
+};
+```
+### 4. 学习
+题解把质数判断从数组变成数位mask
+
+## (02.22) 二进制间距
+### 1. 题目
+[二进制间距](https://leetcode.cn/problems/binary-gap/description/?envType=daily-question&envId=2026-02-22)：给定一个正整数 n，找到并返回 n 的二进制表示中两个 相邻 1 之间的 最长距离 。如果不存在两个相邻的 1，返回 0 。
+
+如果只有 0 将两个 1 分隔开（可能不存在 0 ），则认为这两个 1 彼此 相邻 。两个 1 之间的距离是它们的二进制表示中位置的绝对差。例如，"1001" 中的两个 1 的距离为 3 。
+### 2. 思路
+直接模拟，记录上一个1的位置，计算当前1与上一个1的距离，更新最大距离。
+### 3. 代码
+```cpp
+class Solution {
+public:
+    int binaryGap(int n) {
+        int res = 0, cnt = 0;
+        while(n){
+            if(n&1) res = max(res, cnt), cnt = 1;
+            else if(cnt>0) cnt++;
+            n>>=1;
+        }
+        return res;
+    }
+};
+```
+```python
+class Solution:
+    def binaryGap(self, n: int) -> int:
+        cnt, res = 0, 0
+        while n:
+            if n&1==1:
+                res, cnt = max(res, cnt), 1
+            elif cnt>0:
+                cnt += 1
+            n >>= 1
+        return res
+```
+
+## (02.23) 
 ### 1. 题目
 []()：
 ### 2. 思路
