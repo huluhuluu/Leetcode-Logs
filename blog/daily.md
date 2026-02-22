@@ -427,7 +427,42 @@ class Solution:
         return res
 ```
 
-## (02.23) 
+## (02.23) 检查一个字符串是否包含所有长度为 K 的二进制子串
+### 1. 题目
+[检查一个字符串是否包含所有长度为 K 的二进制子串](https://leetcode.cn/problems/check-if-a-string-contains-all-binary-codes-of-size-k/description/?envType=daily-question&envId=2026-02-22)：给你一个二进制字符串 s 和一个整数 k 。如果所有长度为 k 的二进制字符串都是 s 的子串，请返回 true ，否则请返回 false 。
+
+### 2. 思路
+滑动窗口 + 哈希，判断结果只需要看哈希表的长度是否是2^k。
+
+### 3. 代码
+```cpp
+class Solution {
+public:
+    bool hasAllCodes(string s, int k) {
+        map<string, int> mp;
+        string tmp_s = s.substr(0,k);
+        mp[tmp_s] = 1;
+        for(int i=k;i<s.length();i++){
+            // 滑动窗口
+            tmp_s = tmp_s.substr(1) + s[i];
+            mp[tmp_s] = 1;
+        }
+        return mp.size() == pow(2,k);
+    }
+};
+```
+```python
+class Solution:
+    def hasAllCodes(self, s: str, k: int) -> bool:
+        tmp_s, mp = s[0:k], {s[0:k]:1}
+        for i in range(k, len(s)):
+            tmp_s, mp[tmp_s] = tmp_s[1:] + s[i], 1
+        return len(mp) == 2**k
+```
+### 4. 学习
+数串长度短，可以直接用字符串哈希。
+
+## (02.24) 
 ### 1. 题目
 []()：
 ### 2. 思路
