@@ -462,7 +462,109 @@ class Solution:
 ### 4. 学习
 数串长度短，可以直接用字符串哈希。
 
-## (02.24) 
+## (02.24) 从根到叶的二进制数之和
+### 1. 题目
+[从根到叶的二进制数之和](https://leetcode.cn/problems/sum-of-root-to-leaf-binary-numbers/?envType=daily-question&envId=2026-02-24)：给出一棵二叉树，其上每个结点的值都是 0 或 1 。每一条从根到叶的路径都代表一个从最高有效位开始的二进制数。
+
+例如，如果路径为 0 -> 1 -> 1 -> 0 -> 1，那么它表示二进制数 01101，也就是 13 。
+对树上的每一片叶子，我们都要找出从根到该叶子的路径所表示的数字。
+
+返回这些数字之和。题目数据保证答案是一个 32 位 整数。
+### 2. 思路
+直接DFS，记录当前路径的二进制数值，遇到**叶子节点**就把当前路径的数值加到结果中。
+### 3. 代码
+```cpp
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int sumRootToLeaf(TreeNode* root) {
+        int res = 0;
+        auto dfs = [&res](this auto &&self, TreeNode* root, int val){
+            if(root == nullptr) return;
+            val = (val<<1) + root->val;
+            if(root->left == nullptr && root->right == nullptr) res+=val;
+            self(root->left, val), self(root->right, val);
+        };
+        dfs(root, 0);
+        return res;
+    }
+};
+```
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def sumRootToLeaf(self, root: Optional[TreeNode]) -> int:
+        res = 0
+        def dfs(root, val) -> int:
+            if root == None:
+                return
+            val = (val<<1) + root.val
+            if root.left == None and root.right == None:
+                nonlocal res
+                res += val
+                return
+            dfs(root.left, val), dfs(root.right, val)
+        dfs(root, 0)
+        return res
+```
+
+## (02.25) 根据数字二进制下 1 的数目排序
+### 1. 题目
+[根据数字二进制下 1 的数目排序](https://leetcode.cn/problems/sort-integers-by-the-number-of-1-bits/description/?envType=daily-question&envId=2026-02-24)：给你一个整数数组 arr 。请你将数组中的元素按照其二进制表示中数字 1 的数目升序排序。
+
+如果存在多个数字二进制中 1 的数目相同，则必须将它们按照数值大小升序排列。
+
+请你返回排序后的数组。
+### 2. 思路
+直接排序，排序的比较函数先比较1的个数，再比较数值大小。
+### 3. 代码
+```cpp
+class Solution {
+public:
+    vector<int> sortByBits(vector<int>& arr) {
+        auto cntOne = [](int num){
+            int res = 0;
+            while(num) res++, num = num & (num-1);
+            return res;
+        };
+
+        sort(arr.begin(), arr.end(), [&cntOne](int& a, int &b){
+            int ca = cntOne(a), cb = cntOne(b);
+            if(ca != cb) return ca<cb;
+            return a<b;
+        });
+        return arr;
+    }
+};
+```
+```python
+class Solution:
+    def sortByBits(self, arr: List[int]) -> List[int]:
+        def cntOne(num: int)->int:
+            res = 0
+            while num:
+                res, num = res + 1, num & (num - 1)
+            return res
+        arr.sort(key = lambda x: (cntOne(x), x))
+        return arr
+```
+
+## (02.26) 
 ### 1. 题目
 []()：
 ### 2. 思路
