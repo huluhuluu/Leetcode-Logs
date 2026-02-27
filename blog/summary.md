@@ -1,3 +1,15 @@
+---
+title: "算法刷题小结"
+date: 2026-02-26T12:00:00+08:00
+lastmod: 2026-02-26T12:00:00+08:00
+draft: false
+description: "算法刷题中常见的数据结构、算法技巧与思路总结"
+slug: "leetcode-summary"
+tags: ["LeetCode", "算法", "数据结构", "总结"]
+categories: ["刷题日记"]
+comments: true
+---
+
 # 常见的一些小结
 # 1. 各种更新/查询
 - 前缀和:
