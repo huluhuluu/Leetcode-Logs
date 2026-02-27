@@ -564,7 +564,59 @@ class Solution:
         return arr
 ```
 
-## (02.26) 
+## (02.26) 将二进制表示减到 1 的步骤数
+### 1. 题目
+[将二进制表示减到 1 的步骤数](https://leetcode.cn/problems/number-of-steps-to-reduce-a-number-in-binary-representation-to-one/description/?envType=daily-question&envId=2026-02-26)：给你一个以二进制形式表示的数字 s 。请你返回按下述规则将其减少到 1 所需要的步骤数：
+
+如果当前数字为偶数，则将其除以 2 。
+
+如果当前数字为奇数，则将其加上 1 。
+
+题目保证你总是可以按上述规则将测试用例变为 1 。
+### 2. 思路
+#### 2.1 思路1
+模拟，扫描末尾，如果末尾是0，左移1位，操作次数加1；如果末尾是1，需要加1变成偶数，然后左移1位，操作次数加2，用进位符记录加1操作是否产生进位，如果产生进位，下一轮需要加1。
+#### 2.2 思路2
+- 批量扫描0
+- 批量扫描1，需要额外加1操作次数，如果产生进位，下一轮需要加1。
+### 3. 代码
+```cpp
+class Solution {
+public:
+    int numSteps(string s) {
+        // 1. 扫描0
+        // 2. 扫描1
+        int n = s.length(), idx = s.length() - 1, res = 0;
+        while(idx>=1){
+            while(idx>=1 && s[idx]=='0') idx--, res++;
+            if(idx>=1 && s[idx]=='1'){
+                res++; // 第一个1加1操作
+                while(idx>=0 && s[idx]=='1') idx--, res++; // 扫描到开头位
+                if(idx>=1 && s[idx] == '0') s[idx] = '1'; // 进位
+            }
+        }
+        return res;
+    }
+};
+```
+```python
+class Solution:
+    def numSteps(self, s: str) -> int:
+        flag, res = 0, 0
+        while not((s == '1' and flag == 0) or (s=="" and flag ==1) ):
+            tmp_r = int(s[-1]) + int(flag)
+            s, flag = s[0:-1] + str(tmp_r & 1), ((tmp_r & 2) >> 1)
+            # print(s, flag, res)
+            if s[-1] == '0':
+                s, res = s[0:-1], res + 1
+            else:
+                s, res, flag = s[0:-1], res + 2, flag + 1
+        return res
+```
+### 4. 学习
+[灵神](https://leetcode.cn/problems/number-of-steps-to-reduce-a-number-in-binary-representation-to-one/solutions/3903881/liang-chong-fang-fa-mo-ni-jian-ji-gong-s-dtlf/)题解太优雅了，除了首位，不论0还是1都需要至少1次操作，所以预处理答案为字符串长度-1。剩下的就是扫描1的操作次数，每一连串1需要额外加1操作次数，直接模拟连串1比较麻烦，但是这个操作会把中间串的0变成1，所以可以直接数0的个数，最后加上进位和末尾1的操作次数。
+
+## (02.27) 
 ### 1. 题目
 []()：
 ### 2. 思路
