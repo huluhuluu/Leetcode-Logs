@@ -697,7 +697,131 @@ class Solution:
 [数学方法](https://leetcode.cn/problems/concatenation-of-consecutive-binary-numbers/solutions/510956/lian-jie-lian-xu-er-jin-zhi-shu-zi-by-ze-t40j/)可以优化长度相同的数字的连接(等比数列求和)。
 
 ## 2026.03
-### (03.01) 
+### (03.01) 十-二进制数的最少数目
+#### 1. 题目
+[十-二进制数的最少数目](https://leetcode.cn/problems/partitioning-into-minimum-number-of-deci-binary-numbers/description/?envType=daily-question&envId=2026-03-01)：如果一个十进制数字不含任何前导零，且每一位上的数字不是 0 就是 1 ，那么该数字就是一个 十-二进制数 。例如，101 和 1100 都是 十-二进制数，而 112 和 3001 不是。
+
+给你一个表示十进制整数的字符串 n ，返回和为 n 的 十-二进制数 的最少数目。
+#### 2. 思路
+##### 2.1 思路1
+背包，打表记所有十-二进制数，背包求和， 但是数据范围太大了。
+##### 2.2 思路2
+贪心，从高位往低位看，当前位需要的数字肯定是当前位的数字个数，例如932，最高位9需要9个1xx 相加，所以整个答案是数位的最大值。例如932需要9个1xx相加，其中的3和2可以由这9个1xx组合，如111 + 111 + 110 + 100 + 100 + 100 + 100 + 100 + 100 = 932
+#### 3. 代码
+```cpp
+class Solution {
+public:
+    int minPartitions(string n) {
+        // 1 10 11 100 101 110 111
+        // greedy
+        int res = 0, l = n.length();
+        for(int i=0; i<l; i++){
+            res = max(n[i]-'0', res);
+        }
+        return res;
+    }
+};
+```
+```python
+class Solution:
+    def minPartitions(self, n: str) -> int:
+        return max([int(c) for c in n])
+```
+
+### (03.02) 排布二进制网格的最少交换次数
+#### 1. 题目
+[排布二进制网格的最少交换次数](https://leetcode.cn/problems/minimum-swaps-to-arrange-a-binary-grid/description/?envType=daily-question&envId=2026-03-02)：给你一个 n x n 的二进制网格 grid，每一次操作中，你可以选择网格的 相邻两行 进行交换。
+
+一个符合要求的网格需要满足主对角线以上的格子全部都是 0 。
+
+请你返回使网格满足要求的最少操作次数，如果无法使网格符合要求，请你返回 -1 。
+
+主对角线指的是从 (1, 1) 到 (n, n) 的这些格子。
+#### 2. 思路
+题目样例误导性极强，样例1把不满足要求的行0先向下交换，然后把符合条件的行交换到行0，过程是[0 1 2] -> [1 0 2] -> [1 2 0] -> [2 1 0]；但是仔细一想发现这个策略其实不优，对于每个不满足的行位置，要把下方满足自己的行交换上来的最优策略应该是直接把满足条件的行交换到当前行，而不是先把不满足条件的行交换到下方，这样就避免了不必要的交换次数，也就是过程[0 1 2] -> [0 2 1] -> [2 0 1], 而此时再对行1考虑 只有原来的第一行满足还需要进行一次交换[2 0 1] -> [2 1 0], 样例把顺序交换，误导性很强。
+
+想明白了上面一点，继续思考，这个每行需要的末尾0的长度其实具备**非递增性**，满足条件的行位置一定在当前行的下方，也就是对于每行，只需要贪心的找到能够满足当前行的行位置，交换到当前行就可以了。
+#### 3. 代码
+```cpp
+class Solution {
+public:
+    int minSwaps(vector<vector<int>>& grid) {
+        int n = grid.size(), res = 0;
+        vector<int> l(n, 0);
+        vector<int> vis(n, 0);
+        // 预处理末尾的0
+        for(int i=0;i<n;i++){// row 0
+            for(int j = n-1; j>=0;j--){
+                if(grid[i][j]==0) l[i]++;
+                else break;
+            }
+        }
+        int idx = 0, cnt = 0;
+        // 贪心 每个位置都找最近的符合条件的行 把符合条件的行交换到当前行
+        while(cnt<n-1){
+            if(vis[idx]){
+                idx++;
+                continue;
+            }
+            if(l[idx] >= (n - 1 - cnt)){
+                idx++, cnt++;
+            }
+            else{
+                int flag = 1, tmp_cnt = 1;
+                for(int i = idx+1;i<n;i++){
+                    if(!vis[i] && l[i]>=(n-1-cnt)){
+                        flag = 0, vis[i] = 1, cnt++, res+=tmp_cnt;
+                        break;
+                    }
+                    if(!vis[i]) tmp_cnt++;
+                }
+                if(flag) return -1;
+            }
+        }
+
+        return res;
+    }
+};
+```
+```python
+class Solution:
+    def minSwaps(self, grid: List[List[int]]) -> int:
+        suff, n, res = [0 for i in range(len(grid))], len(grid), 0
+        # 预处理
+        for i in range(n):
+            for k in range(n):
+                j = n - 1 - k
+                if grid[i][j] == 0:
+                    suff[i] += 1
+                else:
+                    break
+        # 对每个位置找第一个符合条件的行
+        idx, vis = 0, [0 for i in range(n)]
+        for i in range(n-1):
+            # find unvis suff
+            while idx < n-1 and vis[idx] == 1:
+                idx += 1
+            if idx >= n:
+                return -1
+            # 当前位置满足条件
+            if suff[idx] >= n - 1 - i:
+                idx += 1
+            else:
+                # 需要向后查找第一个满足条件的要求
+                swap_step, flag = 0, 1
+                for j in range(idx+1, n):
+                    if not vis[j]:
+                        swap_step += 1
+                        if suff[j] >= n - 1 - i:
+                            res, flag, vis[j] = res + swap_step, 0, 1
+                            break
+                if flag:
+                    return -1
+            print(i, idx, res, vis)
+        return res
+```
+
+### (03.03) 
 #### 1. 题目
 []()：
 #### 2. 思路
