@@ -821,7 +821,68 @@ class Solution:
         return res
 ```
 
-### (03.03) 
+### (03.03) 找出第 N 个二进制字符串中的第 K 位
+#### 1. 题目
+[找出第 N 个二进制字符串中的第 K 位](https://leetcode.cn/problems/find-kth-bit-in-nth-binary-string/description/?envType=daily-question&envId=2026-03-03)：给你两个正整数 n 和 k，二进制字符串  Sn 的形成规则如下：
+
+S1 = "0"
+当 i > 1 时，Si = Si-1 + "1" + reverse(invert(Si-1))
+其中 + 表示串联操作，reverse(x) 返回反转 x 后得到的字符串，而 invert(x) 则会翻转 x 中的每一位（0 变为 1，而 1 变为 0）。
+
+例如，符合上述描述的序列的前 4 个字符串依次是：
+
+S1 = "0"
+S2 = "011"
+S3 = "0111001"
+S4 = "011100110110001"
+请你返回  Sn 的 第 k 位字符 ，题目数据保证 k 一定在 Sn 长度范围以内。
+#### 2. 思路
+典型的把大问题拆分成小问题，递归解决。
+- 第一步，计算Sn的长度，Sn的长度是2^n - 1：现有递推式l(n) = 2 * l(n-1) + 1，l(1) = 1，两边配常数得到l(n) + 1 = 2 * (l(n-1) + 1)，所以l(n) = 2^n - 1。
+- 第二步，找到Sn的中间位置mid，mid = (l(n) >> 1) + 1，接下来分情况讨论
+  - 如果k==mid 中间字符直接返回1。
+  - 如果k<mid 说明k在Sn-1中，直接递归求解Sn-1的第k位。
+  - 如果k>mid 说明k在reverse(invert(Sn-1))中，求解Sn-1的第l(n)-k+1位的取反结果返回。
+#### 3. 代码
+```cpp
+class Solution {
+public:
+    inline char charNot(char c){
+        return c=='0'?'1':'0';
+    }
+    char findKthBit(int n, int k) {
+        // 1 3 7 15
+        // l(n) = 2 * l(n-1) + 1
+        // l(n) = 2^(n+1) - 1
+
+        if(n==1) return '0';
+        long long l = (1<<n) - 1;
+        long long mid = (l >> 1) + 1;
+        if(k==mid) return '1';
+        if(k<mid){
+            return findKthBit(n-1, k);
+        }
+        return charNot(findKthBit(n-1, l-k+1));
+    }
+};
+```
+```python
+class Solution:
+    def findKthBit(self, n: int, k: int) -> str:
+        if n==1:
+            return "0"
+        l = (1<<n) - 1
+        mid = (l>>1) + 1
+        if k == mid:
+            return "1"
+        if k < mid:
+            return self.findKthBit(n-1, k)
+        return "0" if self.findKthBit(n-1, l - k + 1) == "1" else "1"
+```
+#### 4. 学习
+[灵神](https://leetcode.cn/problems/find-kth-bit-in-nth-binary-string/solutions/3908610/liang-chong-xie-fa-di-gui-die-dai-python-je8p/)数学解法恐怖如斯，分奇偶判断每个位置的发源数。
+
+### (03.04) 
 #### 1. 题目
 []()：
 #### 2. 思路
