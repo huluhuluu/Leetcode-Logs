@@ -882,7 +882,57 @@ class Solution:
 #### 4. 学习
 [灵神](https://leetcode.cn/problems/find-kth-bit-in-nth-binary-string/solutions/3908610/liang-chong-xie-fa-di-gui-die-dai-python-je8p/)数学解法恐怖如斯，分奇偶判断每个位置的发源数。
 
-### (03.04) 
+### (03.04) 二进制矩阵中的特殊位置
+#### 1. 题目
+[二进制矩阵中的特殊位置](https://leetcode.cn/problems/special-positions-in-a-binary-matrix/description/?envType=daily-question&envId=2026-03-04)：给定一个 m x n 的二进制矩阵 mat，返回矩阵 mat 中特殊位置的数量。
+
+如果位置 (i, j) 满足 mat[i][j] == 1 并且行 i 与列 j 中的所有其他元素都是 0（行和列的下标从 0 开始计数），那么它被称为 特殊 位置。
+#### 2. 思路
+预处理行/列和，扫描每个为1的位置，判断行/列和是否为1。
+#### 3. 代码
+```cpp
+class Solution {
+public:
+    int numSpecial(vector<vector<int>>& mat) {
+        int m = mat.size(), n = mat[0].size(), res = 0;
+        vector<int> r(m+1, 0);
+        vector<int> c(n+1, 0);
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                r[i+1] += mat[i][j];
+                c[j+1] += mat[i][j];
+            }
+        }
+        
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                if(mat[i][j] && r[i+1]==1 && c[j+1]==1) res+=1;
+            }
+        }
+        return res;
+    }
+};
+```
+```python
+class Solution:
+    def numSpecial(self, mat: List[List[int]]) -> int:
+        m, n, res = len(mat), len(mat[0]), 0
+        r, c = [0 for i in range(m+1)], [0 for i in range(n+1)]
+        for i in range(m):
+            for j in range(n):
+                r[i+1] += mat[i][j]
+                c[j+1] += mat[i][j]
+                
+        for i in range(m):
+            for j in range(n):
+                if mat[i][j]==1 and r[i+1]==1 and c[j+1]==1:
+                    res += 1
+        return res
+```
+#### 4. 学习
+可以用时间换空间。
+
+### (03.05) 
 #### 1. 题目
 []()：
 #### 2. 思路
