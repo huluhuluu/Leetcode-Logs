@@ -8,6 +8,7 @@ slug: "leetcode-hot100"
 tags: ["LeetCode", "算法", "刷题", "Hot100"]
 categories: ["刷题日记"]
 comments: true
+math: true
 ---
 
 # Hot100

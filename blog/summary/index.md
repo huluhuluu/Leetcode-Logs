@@ -8,6 +8,7 @@ slug: "leetcode-summary"
 tags: ["LeetCode", "算法", "数据结构", "总结"]
 categories: ["刷题日记"]
 comments: true
+math: true
 ---
 
 # 常见的一些小结

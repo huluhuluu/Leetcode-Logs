@@ -8,6 +8,7 @@ slug: "leetcode-daily"
 tags: ["LeetCode", "算法", "刷题"]
 categories: ["刷题日记"]
 comments: true
+math: true
 ---
 
 # Leetcode 每日一题
