@@ -932,6 +932,43 @@ class Solution:
 #### 4. 学习
 可以用时间换空间。
 
+### (03.05) 生成交替二进制字符串的最少操作数
+#### 1. 题目
+[生成交替二进制字符串的最少操作数](https://leetcode.cn/problems/minimum-changes-to-make-alternating-binary-string/description/?envType=daily-question&envId=2026-03-05)：给你一个仅由字符 '0' 和 '1' 组成的字符串 s 。一步操作中，你可以将任一 '0' 变成 '1' ，或者将 '1' 变成 '0' 。
+
+交替字符串 定义为：如果字符串中不存在相邻两个字符相等的情况，那么该字符串就是交替字符串。例如，字符串 "010" 是交替字符串，而字符串 "0100" 不是。
+
+返回使 s 变成 交替字符串 所需的 最少 操作数。
+#### 2. 思路
+最后的交替字符串只有两种可能，010101...或者101010... 这两种可能又刚好相反，也就是变化到情况1需要的操作次数与变化到情况2需要的操作次数互补（和等于字符串长度），所以只需要统计变化到其中一种情况的操作次数。
+#### 3. 代码
+```cpp
+class Solution {
+public:
+    int minOperations(string s) {
+        int cnt=0, flag='0', n=s.length();
+        for(char& c:s){
+            if(c==flag) cnt++;
+            flag = '1' - flag + '0';
+        }
+        return n - max(cnt, n-cnt);
+    }
+};
+```
+```python
+class Solution:
+    def minOperations(self, s: str) -> int:
+        cnt, flag, n = 0, 0, len(s)
+        for i in range(n):
+            if s[i]==str(flag):
+                cnt+=1
+            flag = 1 - flag
+        return n - max(cnt, n-cnt)
+
+```
+#### 4. 学习
+可以根据下标奇偶数性统计该位置对应某一个变化后的字符串后应该是0还是1，统计不匹配的个数。
+
 ### (03.05) 
 #### 1. 题目
 []()：
