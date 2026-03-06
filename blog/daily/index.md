@@ -970,7 +970,47 @@ class Solution:
 #### 4. 学习
 可以根据下标奇偶数性统计该位置对应某一个变化后的字符串后应该是0还是1，统计不匹配的个数。
 
-### (03.05) 
+### (03.06) 检查二进制字符串字段
+#### 1. 题目
+[检查二进制字符串字段](https://leetcode.cn/problems/check-if-binary-string-has-at-most-one-segment-of-ones/description/?envType=daily-question&envId=2026-03-06)：给你一个二进制字符串 s ，该字符串 不含前导零 。
+
+如果 s 包含 零个或一个由连续的 '1' 组成的字段 ，返回 true​​​ 。否则，返回 false 。
+#### 2. 思路
+只有一种可能字符串是111...111000...000, 直接扫描模拟。
+#### 3. 代码
+```cpp
+class Solution {
+public:
+    bool checkOnesSegment(string s) {
+        bool flag = 1;
+        for(char& c: s){
+            if(c=='1' && flag==1) continue; 
+            if(c=='0'){
+                flag = 0;
+                continue;
+            }
+            else return false;
+        }
+        return true;
+    }
+};
+```
+```python
+class Solution:
+    def checkOnesSegment(self, s: str) -> bool:
+        idx, n, flag = 0, len(s), -1
+        while idx<n:
+            flag += 1
+            while idx<n and s[idx]=='1':
+                idx += 1
+            while idx<n and s[idx]=='0':
+                idx += 1
+        return not flag
+```
+#### 4. 学习
+对于不满足条件的字符串包含 01。
+
+### (03.07) 
 #### 1. 题目
 []()：
 #### 2. 思路
