@@ -1066,7 +1066,114 @@ class Solution:
 #### 4. 学习
 操作1会获得结果为s+s的子串，在这个子串上做最大窗口为n的滑动窗口统计子串的最大长度。
 
-### (03.08) 
+### (03.08) 检查二进制字符串字段
+#### 1. 题目
+[检查二进制字符串字段](https://leetcode.cn/problems/check-if-binary-string-has-at-most-one-segment-of-ones/description/?envType=daily-question&envId=2026-03-11)：给你一个二进制字符串 s ，该字符串 不含前导零 。
+
+如果 s 包含 零个或一个由连续的 '1' 组成的字段 ，返回 true​​​ 。否则，返回 false
+#### 2. 思路
+模拟 扫描, 超过1个连续1的字段 就是false
+#### 3. 代码
+```cpp
+class Solution {
+public:
+    bool checkOnesSegment(string s) {
+        bool flag = 1;
+        for(char& c: s){
+            if(c=='1' && flag==1) continue; 
+            if(c=='0'){
+                flag = 0;
+                continue;
+            }
+            else return false;
+        }
+        return true;
+    }
+};
+```
+```python
+class Solution:
+    def checkOnesSegment(self, s: str) -> bool:
+        idx, n, flag = 0, len(s), -1
+        while idx<n:
+            flag += 1
+            while idx<n and s[idx]=='1':
+                idx += 1
+            while idx<n and s[idx]=='0':
+                idx += 1
+        return not flag
+```
+
+### (03.09) 找出不同的二进制字符串
+#### 1. 题目
+[找出不同的二进制字符串](https://leetcode.cn/problems/find-unique-binary-string/description/?envType=daily-question&envId=2026-03-11)：给你一个字符串数组 nums ，该数组由 n 个 互不相同 的二进制字符串组成，且每个字符串长度都是 n 。请你找出并返回一个长度为 n 且 没有出现 在 nums 中的二进制字符串。如果存在多种答案，只需返回 任意一个 即可。
+#### 2. 思路
+考虑一个构造法, 数组长度为n且字符串长度为n, 那么每个字符串的1可能有0,1,2,...,n个, 共n+1种可能, 但是数组中只有n个字符串, 所以至少有一种可能的1的个数没有被数组中的字符串使用。那么我们就可以构造一个字符串, 让这个字符串的1的个数等于这个没有被使用的1的个数, 这样这个字符串就不可能在数组中出现。
+#### 3. 代码
+```python
+class Solution:
+    def findDifferentBinaryString(self, nums: List[str]) -> str:
+        # 0 1 2
+        unvis, n = set(i for i in range(len(nums) + 1)), len(nums)
+        def cntOne(str: s):
+            cnt = 0
+            for c in s:
+                cnt += (c=='1')
+            return cnt
+        for s in nums:
+            cnt = cntOne(s)
+            if cnt in unvis:
+                unvis.remove(cnt)
+        cnt = unvis.pop()
+        return "1"*cnt + "0"*(n-cnt)
+```
+#### 4. 学习
+[灵神](https://leetcode.cn/problems/find-unique-binary-string/solutions/951165/)题解中更优秀的构造法,复杂度可以达到O(n),只要构造一个字符串, 这个字符串的第i位与数组中第i个字符串的第i位相反, 这样这个字符串就不可能在数组中出现。
+
+### (03.09 & 03.10) 找出所有稳定的二进制数组 I
+#### 1. 题目
+[找出所有稳定的二进制数组 I](https://leetcode.cn/problems/find-all-possible-stable-binary-arrays-i/description/?envType=daily-question&envId=2026-03-11)：给你 3 个正整数 zero ，one 和 limit 。
+
+一个 二进制数组 arr 如果满足以下条件，那么我们称它是 稳定的 ：
+
+0 在 arr 中出现次数 恰好 为 zero 。
+1 在 arr 中出现次数 恰好 为 one 。
+arr 中每个长度超过 limit 的 子数组 都 同时 包含 0 和 1 。
+请你返回 稳定 二进制数组的 总 数目。
+
+由于答案可能很大，将它对 109 + 7 取余 后返回。
+#### 2. 思路
+动态规划和鸽笼原理,没想出来转移方程,直接学习了[题解](https://leetcode.cn/problems/find-all-possible-stable-binary-arrays-ii/solutions/2758868/dong-tai-gui-hua-cong-ji-yi-hua-sou-suo-37jdi/): 受到limit限制需要减去超出limit的状态
+
+
+### (03.11) 十进制整数的反码
+#### 1. 题目
+[十进制整数的反码](https://leetcode.cn/problems/complement-of-base-10-integer/description/?envType=daily-question&envId=2026-03-11)：每个非负整数 N 都有其二进制表示。例如， 5 可以被表示为二进制 "101"，11 可以用二进制 "1011" 表示，依此类推。注意，除 N = 0 外，任何二进制表示中都不含前导零。
+
+二进制的反码表示是将每个 1 改为 0 且每个 0 变为 1。例如，二进制数 "101" 的二进制反码为 "010"。
+
+给你一个十进制数 N，请你返回其二进制表示的反码所对应的十进制整数
+#### 2. 思路
+得从高位开始反转,不然前缀0也会被反转到。为了一次遍历可以使用递归,在回溯时当前位都是有效位,进行反转与结果的累计。递归边界是0,需要特判0。
+#### 3. 代码
+```cpp
+class Solution {
+public:
+    void dfs(int &res, int num){
+        if(num==0) return;     
+        dfs(res, num>>1);
+        res = !(num&1) + (res<<1);
+    }
+    int bitwiseComplement(int n) {
+        if(n==0) return 1;
+        int res = 0;
+        dfs(res, n);
+        return res;
+    }
+};
+```
+
+### (03.12) 
 #### 1. 题目
 []()：
 #### 2. 思路
