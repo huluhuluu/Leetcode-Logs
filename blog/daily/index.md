@@ -1284,7 +1284,84 @@ public:
 };
 ```
 
-### (03.15) 
+### (03.15) 奇妙序列
+#### 1. 题目
+[奇妙序列](https://leetcode.cn/problems/fancy-sequence/description/?envType=daily-question&envId=2026-03-15)：请你实现三个 API append，addAll 和 multAll 来实现奇妙序列。
+
+请实现 Fancy 类 ：
+
+Fancy() 初始化一个空序列对象。
+void append(val) 将整数 val 添加在序列末尾。
+void addAll(inc) 将所有序列中的现有数值都增加 inc 。
+void multAll(m) 将序列中的所有现有数值都乘以整数 m 。
+int getIndex(idx) 得到下标为 idx 处的数值（下标从 0 开始），并将结果对 109 + 7 取余。如果下标大于等于序列的长度，请返回 -1 。
+#### 2. 思路
+这里的修改需要对数组所有成员进行修改, 但是查询是单点查询, 可以使用树状数组/线段树,为了减少修改次数可以使用lazy tag打懒标记, 我们接下来考虑lazy tag.
+对于一个数, 可以表示成$ax + b$的形式, 
+- 遇到加法, 数变成$ax + b + c$, 那么$a_1 = a, b_1 = b + c$ 
+- 遇到乘法, 数变成$(ax + b) * c$, 那么$a_1 = a * c, b_1 = b * c$
+也就是对于两个操作可以用两个懒标记覆盖所有数字的操作.
+
+接下来的问题是添加的数字不能使用已经计算的懒标记, 可以做一个逆运算计算: 当前添加的数字在需要全局懒标记的情况下的值: $val = a * x + b$ 那么 $x = (val - b) * a^{-1}$, 因为是在取模下的运算, 所以这里的除非需要用逆元的乘法. 1e9 + 7 是质数,这里可以用费马小定理来求逆元.
+#### 3. 代码
+```cpp
+class Fancy {
+public:
+    int inv(int a){
+        int e = mod-2, res = 1;
+        while(e>0){
+            if(e&1){
+                res = (1ll * res * a) % mod;
+            }
+            e>>=1, a = (1ll * a * a ) % mod;
+        }
+        return res;
+    }
+
+    Fancy() {
+        lazy_tag = std::make_pair(0,1);
+    }
+
+    void append(int val) {
+        // val = b + ax
+        // x = (val - b) / a
+        nums.emplace_back(((val - lazy_tag.first + mod) * 1ll * inv(lazy_tag.second) ) % mod);
+    }
+    
+    void addAll(int inc) {
+        // b + ax
+        lazy_tag.first = (lazy_tag.first + inc) % mod;
+    }
+    
+    void multAll(int m) {
+        // (b + ax) * m
+        lazy_tag.first = (1ll * lazy_tag.first * m) % mod;
+        lazy_tag.second = (1ll * lazy_tag.second * m) % mod;
+    }
+    
+    int getIndex(int idx) {
+        if(idx >= nums.size()) return -1;
+        long long num = (lazy_tag.first + 1ll * nums[idx] * lazy_tag.second) % mod;
+        return num;
+    }
+private:
+    vector<int> nums;
+    pair<int, int> lazy_tag; // (add, mul)
+    static const int mod = 1e9+7;
+};
+
+/**
+ * Your Fancy object will be instantiated and called as such:
+ * Fancy* obj = new Fancy();
+ * obj->append(val);
+ * obj->addAll(inc);
+ * obj->multAll(m);
+ * int param_4 = obj->getIndex(idx);
+ */
+```
+
+
+### (03.16) 
 #### 1. 题目
 []()：
 #### 2. 思路
