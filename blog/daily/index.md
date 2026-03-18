@@ -1361,7 +1361,93 @@ private:
 ```
 
 
-### (03.16) 
+### (03.16) 矩阵中最大的三个菱形和
+#### 1. 题目
+[矩阵中最大的三个菱形和](https://leetcode.cn/problems/get-biggest-three-rhombus-sums-in-a-grid/description/?envType=daily-question&envId=2026-03-18)：给你一个 m x n 的整数矩阵 grid 。
+
+菱形和 指的是 grid 中一个正菱形 边界 上的元素之和。本题中的菱形必须为正方形旋转45度，且四个角都在一个格子当中。下图是四个可行的菱形，每个菱形和应该包含的格子都用了相应颜色标注在图中
+#### 2. 思路
+维护两条斜线的前缀和, 枚举每个位置以及菱形边长.
+
+### (03.17) 重新排列后的最大子矩阵 
+#### 1. 题目
+[重新排列后的最大子矩阵](https://leetcode.cn/problems/largest-submatrix-with-rearrangements/description/?envType=daily-question&envId=2026-03-18)：给你一个二进制矩阵 matrix ，它的大小为 m x n ，你可以将 matrix 中的 列 按任意顺序重新排列。
+
+请你返回最优方案下将 matrix 重新排列后，全是 1 的最大子矩阵面积
+#### 2. 思路
+看到数据大小是$1 <= m * n <= 10^5$, 时间复杂度是$O(mnlog(max(m,n)))$, 其中$O(mn)$遍历位置,$O(log(max(m,n)))$ 用于排序/二分, 思考发现这里是排序 不适合二分, 这里的排序可以用来把对应行的具有1的位置拼凑在一起:
+维护每个位置列方向往下的1的个数, 然后对每一行降序排序, 排序后前面紧凑的部分都是1, 对每一行按顺序把1的位置求出面积.
+#### 3. 代码
+```cpp
+class Solution {
+public:
+    int largestSubmatrix(vector<vector<int>>& matrix) {
+        int m = matrix.size(), n = matrix[0].size();
+        vector<vector<int> > suf(m+1, vector<int>(n+1, 0));
+        for(int i=m-1;i>=0;i--){
+            for(int j=0;j<n;j++){
+                if(matrix[i][j]){
+                    suf[i][j] = suf[i+1][j] + matrix[i][j];
+                }
+            }
+        }
+        int res = 0;
+        for(int i=0;i<m;i++){
+            sort(suf[i].begin(), suf[i].end(), [](int &a, int&b){return a>b;});
+            int minL = suf[i][0];
+            for(int j=0;j<n;j++){
+                minL = min(minL, suf[i][j]);
+                res = max(res, minL * (j + 1));
+            }
+        }
+        return res;
+    }
+};
+```
+#### 4. 学习
+每一行的向下的1的个数的相对大小是比较确定的,可以把排序变成遍历,参考[灵神](https://leetcode.cn/problems/largest-submatrix-with-rearrangements/solutions/3920921/mei-ju-zi-ju-xing-de-di-bian-omn-you-hua-dfy3/)的题解
+### (03.18) 元素和小于等于 k 的子矩阵的数目
+#### 1. 题目
+[元素和小于等于 k 的子矩阵的数目](https://leetcode.cn/problems/count-submatrices-with-top-left-element-and-sum-less-than-k/description/?envType=daily-question&envId=2026-03-18)：给你一个下标从 0 开始的整数矩阵 grid 和一个整数 k。
+
+返回包含 grid 左上角元素、元素和小于或等于 k 的 子矩阵的数目。
+#### 2. 思路
+##### 2.1 思路1
+保存对行的前缀和, 然后从左上角开始搜索, 只有第一行能向右移动, 所有符合位置的条件都能向下移动.
+##### 2.2 思路2
+二维前缀和,遍历每个位置, 可以做剪枝.
+#### 3. 代码
+```cpp
+class Solution {
+public:
+    int countSubmatrices(vector<vector<int>>& grid, int k) {
+        int m = grid.size(), n = grid[0].size();
+        vector<vector<int> > pre(m, vector<int>(n+1) );
+        for(int i=0; i<m; i++){
+            for(int j=0; j<n; j++){
+                pre[i][j+1] = pre[i][j] + grid[i][j];
+            }
+        }
+        int res = 0;
+        auto dfs = [&res, &pre, &m, &n, &k, &grid](this auto&&self, int i, int j, int sum) -> void{
+            if(i>=m || j>=n || sum>k) return;
+            if(i==0){
+                sum += grid[i][j];
+                self(i, j+1, sum);
+            }
+            else{
+                sum+=pre[i][j+1];
+            }
+            if(sum<=k) res += 1;
+            self(i+1, j, sum);
+        };
+        dfs(0, 0, 0);
+        return res;
+    }
+};
+```#### 4. 学习
+
+### (03.19) 
 #### 1. 题目
 []()：
 #### 2. 思路
