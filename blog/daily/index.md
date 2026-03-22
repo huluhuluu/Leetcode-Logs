@@ -1445,9 +1445,118 @@ public:
         return res;
     }
 };
-```#### 4. 学习
+```
 
-### (03.19) 
+### (03.19) 统计 X 和 Y 频数相等的子矩阵数量
+#### 1. 题目
+[统计 X 和 Y 频数相等的子矩阵数量](https://leetcode.cn/problems/count-submatrices-with-equal-frequency-of-x-and-y/?envType=daily-question&envId=2026-03-22)：给你一个二维字符矩阵 grid，其中 grid[i][j] 可能是 'X'、'Y' 或 '.'，返回满足以下条件的子矩阵数量：
+
+包含 grid[0][0]
+'X' 和 'Y' 的频数相等。
+至少包含一个 'X'。
+#### 2. 思路
+从左上角开始搜索，用一个一维数组统计当前第i行前一行第j列为右下角的矩阵的'x'和'y'的频数, 并用前缀和统计当前行的频数，可以通过当前行和前一行的频数得到当前位置的所有频数。
+#### 3. 代码
+```cpp
+class Solution {
+public:
+    int numberOfSubmatrices(vector<vector<char>>& grid) {
+        int m = grid.size(), n = grid[0].size(), res = 0;
+        
+        vector<pair<int, int> > pre(n, {0, 0});
+        for(int i=0; i<m; i++){
+            int x = 0, y=0;
+            for(int j=0;j<n;j++){
+                x += (grid[i][j]=='X'), y += (grid[i][j]=='Y'); 
+                if(i==0)  pre[j].first = x, pre[j].second = y;
+                else pre[j].first += x, pre[j].second += y;
+                if(pre[j].first == pre[j].second && pre[j].first > 0) res+=1;
+            }
+        }
+        return res;
+    }
+};
+```
+
+### (03.20) 子矩阵的最小绝对差
+#### 1. 题目
+[子矩阵的最小绝对差](https://leetcode.cn/problems/minimum-absolute-difference-in-sliding-submatrix/?envType=daily-question&envId=2026-03-22)：给你一个 m x n 的整数矩阵 grid 和一个整数 k。
+
+对于矩阵 grid 中的每个连续的 k x k 子矩阵，计算其中任意两个 不同值 之间的 最小绝对差 。
+
+返回一个大小为 (m - k + 1) x (n - k + 1) 的二维数组 ans，其中 ans[i][j] 表示以 grid 中坐标 (i, j) 为左上角的子矩阵的最小绝对差。
+
+注意：如果子矩阵中的所有元素都相同，则答案为 0。
+
+子矩阵 (x1, y1, x2, y2) 是一个由选择矩阵中所有满足 x1 <= x <= x2 且 y1 <= y <= y2 的单元格 matrix[x][y] 组成的矩阵。
+#### 2. 思路
+直接模拟排序。
+
+### (03.21) 垂直翻转子矩阵
+#### 1. 题目
+[垂直翻转子矩阵](http://leetcode.cn/problems/flip-square-submatrix-vertically/?envType=daily-question&envId=2026-03-22)：给你一个 m x n 的整数矩阵 grid，以及三个整数 x、y 和 k。
+
+整数 x 和 y 表示一个 正方形子矩阵 的左上角下标，整数 k 表示该正方形子矩阵的边长。
+
+你的任务是垂直翻转子矩阵的行顺序。
+
+返回更新后的矩阵。
+#### 2. 思路
+直接模拟交换。
+
+### (03.22) 判断矩阵经轮转后是否一致
+#### 1. 题目
+[判断矩阵经轮转后是否一致](https://leetcode.cn/problems/determine-whether-matrix-can-be-obtained-by-rotation/description/?envType=daily-question&envId=2026-03-22)：给你两个大小为 n x n 的二进制矩阵 mat 和 target 。现 以 90 度顺时针轮转 矩阵 mat 中的元素 若干次 ，如果能够使 mat 与 target 一致，返回 true ；否则，返回 false 。
+#### 2. 思路
+旋转4次后矩阵变回原矩阵，所以只需要枚举4种情况。可以通过下标的变化模拟旋转，
+考虑1次旋转的情况，原矩阵：
+$$
+\begin{pmatrix}
+a_{11} & a_{12} & a_{13} \\
+a_{21} & a_{22} & a_{23} \\
+a_{31} & a_{32} & a_{33} 
+\end{pmatrix}
+$$
+旋转后：
+$$
+\begin{pmatrix}
+a_{31} & a_{21} & a_{11} \\
+a_{32} & a_{22} & a_{12} \\
+a_{33} & a_{23} & a_{13}
+\end{pmatrix}
+$$
+可以发现第一行的值变成了最后一列的值，第2行的值变成了倒数第2列的值。坐标对应变换关系是：$$(i,j) \rightarrow (j,n-i-1) $$
+#### 3. 代码
+```cpp
+class Solution {
+public:
+    bool findRotation(vector<vector<int>>& mat, vector<vector<int>>& target) {
+        int n = mat.size();
+        auto f = [&n](int i, int j){
+            return std::make_pair(j, n-1-i);
+        };
+        vector<int> res(4, 1);
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                int x = i, y=j;
+                for(int k=0;k<4;k++){
+                    if(res[k] &&  mat[x][y]!=target[i][j]){
+                        res[k] = 0;
+                    }
+                    auto tmp = f(x,y);
+                    x=tmp.first, y = tmp.second;
+                }
+            }
+        }
+        for(int k=0;k<4;k++){
+            if(res[k]==1) return true;
+        }
+        return false;
+    }
+};
+```
+
+### (03.23) 
 #### 1. 题目
 []()：
 #### 2. 思路
