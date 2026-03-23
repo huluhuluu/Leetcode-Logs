@@ -1556,7 +1556,50 @@ public:
 };
 ```
 
-### (03.23) 
+### (03.23) 矩阵的最大非负积
+#### 1. 题目
+[矩阵的最大非负积](https://leetcode.cn/problems/maximum-non-negative-product-in-a-matrix/description/?envType=daily-question&envId=2026-03-23)：给你一个大小为 m x n 的矩阵 grid 。最初，你位于左上角 (0, 0) ，每一步，你可以在矩阵中 向右 或 向下 移动。
+
+在从左上角 (0, 0) 开始到右下角 (m - 1, n - 1) 结束的所有路径中，找出具有 最大非负积 的路径。路径的积是沿路径访问的单元格中所有整数的乘积。
+
+返回 最大非负积 对 109 + 7 取余 的结果。如果最大积为 负数 ，则返回 -1 。
+
+注意，取余是在得到最大积之后执行的。
+#### 2. 思路
+动态转移方程很明显，从上/左方向转移，需要维护最大正值和最小负值， 如果当前位置值是正数，那么正数和负数分别从正数和负数转移，如果当前值是负数，那么正数和负数分别从负数和正数转移。
+
+如果选择下标+1的方式存dp数组，需要额外加一个标记表示答案能否是0
+#### 3. 代码
+```cpp
+class Solution {
+public:
+    int maxProductPath(vector<vector<int>>& grid) {
+        int m = grid.size(), n = grid[0].size();
+        vector<vector<std::pair<long long, long long> > > dp(m+1, vector<std::pair<long long, long long> >(n+1, std::make_pair(0, 0) ) );
+        dp[1][0] = {1,0}, dp[0][1] = {1,0};
+        int flag = 0; // 标记答案能不能为0
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                if(grid[i][j]==0) flag = true;
+                if(grid[i][j]>0){
+                    dp[i+1][j+1].first = max(dp[i+1][j].first, dp[i][j+1].first) * grid[i][j];
+                    dp[i+1][j+1].second = min(dp[i+1][j].second, dp[i][j+1].second) * grid[i][j];
+                }
+                else{
+                    dp[i+1][j+1].first = min(dp[i+1][j].second, dp[i][j+1].second) * grid[i][j];
+                    dp[i+1][j+1].second = max(dp[i+1][j].first, dp[i][j+1].first) * grid[i][j];
+                }
+                std::cout<<i<<" "<<j<<" "<<dp[i+1][j+1].first<<" "<<dp[i+1][j+1].second<<std::endl;
+            }
+        }
+        int res = dp[m][n].first % int(1e9+7);
+        if(dp[m][n].first == 0) return flag?0:-1;
+        return res>0 ? res : -1;
+    }
+};
+```
+
+### (03.24) 
 #### 1. 题目
 []()：
 #### 2. 思路
